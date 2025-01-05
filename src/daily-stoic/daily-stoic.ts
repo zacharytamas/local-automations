@@ -36,7 +36,9 @@ async function sendToMattermost(chapter: Chapter) {
   const message = `**${chapter.title}**\n\n${chapterContent}`
 
   const existingPost = Object.values(posts.posts).find(
-    (post) => post.props['daily-stoic'] === true && post.props['daily-stoic-date'] === chapter.date,
+    (post) =>
+      post.props['daily-stoic'] === true &&
+      post.props['daily-stoic-date'] === chapter.date,
   )
   if (existingPost) {
     return client.patchPost({ id: existingPost.id, message })
@@ -57,9 +59,12 @@ async function sendToMattermost(chapter: Chapter) {
 }
 
 async function getTodayChapter(): Promise<Chapter> {
-  const chapters = parse(await Bun.file(`${__dirname}/${'daily-stoic'}.yaml`).text())
+  const chapters = parse(await Bun.file(`${__dirname}/daily-stoic.yaml`).text())
 
-  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  const today = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+  })
 
   if (!chapters[today]) {
     throw Error('No chapter found for today.')
@@ -70,12 +75,14 @@ async function getTodayChapter(): Promise<Chapter> {
   return todayChapter
 }
 
-try {
-  const todayChapter = await getTodayChapter()
+if (import.meta.main) {
+  try {
+    const todayChapter = await getTodayChapter()
 
-  await sendToMattermost(todayChapter)
-  console.log(chalk.green('✅ Post for today created/updated'))
-} catch (error) {
-  console.error(error)
-  process.exit(1)
+    await sendToMattermost(todayChapter)
+    console.log(chalk.green('✅ Post for today created/updated'))
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
 }
