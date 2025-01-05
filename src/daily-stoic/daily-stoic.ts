@@ -33,7 +33,7 @@ async function sendToMattermost(chapter: Chapter) {
 
   console.log(`${chapterContent}\n`)
 
-  const message = `**${chapter.title}**\n\n${chapterContent}`
+  const message = `### Daily Stoic for ${chapter.date}\n#### ${chapter.title}\n\n${chapterContent}`
 
   const existingPost = Object.values(posts.posts).find(
     (post) =>
